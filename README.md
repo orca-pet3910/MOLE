@@ -9,5 +9,7 @@ a recommended version of Python is Python 3.12.2
 ## how to use
 the syntax for the command is
 `python mole.py filename.mole`
-a .mole file extension is unnecessary
+
+a .mole file extension is unnecessary too
+
 you should read the help sheet too by making a file with nothing but `help` in it and running it with mole.py
