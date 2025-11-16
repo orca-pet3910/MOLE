@@ -1,6 +1,5 @@
 from time import sleep
 import shlex
-from io import BytesIO
 
 version = "v2.0"
 print(f"MOLE version {version} - made by orca.pet")
@@ -245,3 +244,4 @@ if version[-1] == "b":
     mole.iwarn(f"beta version ahead; use at your own risk")
 
 mole.interpret(maincode)
+
