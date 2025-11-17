@@ -1,5 +1,5 @@
-# MOLE v2.0
-welcome to MOLE, a programming language project!
+# NA-MOLE v2
+welcome to NA-MOLE, a programming language project!
 ## dependencies
 - `__random__`
 - `__shell__`
