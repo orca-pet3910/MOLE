@@ -211,9 +211,10 @@ class MOLE:
     "let variablename be [string/nul/bool/number value]": variable definition. defines variablename and its value, [string/nul/bool/number value] (in
     other words: adds the variable to the variables dictionary)
     "use [object]": includes an object, for example "random" will unlock "randomint [x] [y]"
-    "randomint [x] [y]": generates a random integer within the range of [x] and [y]. (requires 'random')
+    "randomint [x] [y] [z]": generates a random integer within the range of [x] and [y] to [z]. (requires 'random')
     "eval [in] -> [out]": passes through booleans, turns other values into nul (requires 'statements')
     "if [a] [equals/nequals/lessthan/morethan] [b] -> [c]": an if statement (requires 'statements')
+    "[asknumber/askbool/askstr] [x] [STRING]": ask for values
                         """, end="")
                     elif ln[0] == "use":
                         if ln[1] == "random":
@@ -225,7 +226,7 @@ class MOLE:
                         elif ln[1] == "statements":
                             try:
                                 global if_statement
-                                from __statements__ import if_statement, if_eval
+                                from __statements__ import if_statement, if_eval, if_file
                             except:
                                 self.ierror(MOLEPackageMissing, "")
                         elif ln[1] == "__shell__":
@@ -301,6 +302,18 @@ class MOLE:
                             raise MOLEInterpreterError("Invalid value") from ValueError("Invalid value")
                     elif ln[0] == "askstr":
                         self.variables[ln[1]] = input(ln[2])
+                    elif ln[0] == "execifeval":
+                        try:
+                            if if_file(self.variables[ln[1]], self._["yea"], self._["nah"]) == self._["yea"]:
+                                if ln[2] != "exit":
+                                    with open(ln[2] + ".mole", "r", encoding="utf-8") as included:
+                                        self.interpret(included.read().splitlines())
+                                else:
+                                    exit()
+                        except FileNotFoundError:
+                            raise RuntimeError(f"execution failed; no such file {ln[2]}")
+                        except NameError:
+                            raise MOLEInterpreterError("Please put `use statements` in code")
                     else:
                         raise SyntaxError(f"{ln[0]} is not a valid keyword")
                 except IndexError:
@@ -310,7 +323,7 @@ class MOLE:
 
 mole = MOLE()
 
-version = "v2.3"
+version = "v2.4"
 version_name = "Feature Update 2 Subrelease 3"
 if __name__ == "__main__" and not "--nologo" in argv:
     print(f"MOLE version {version} ({version_name}) - made by orca.pet")
