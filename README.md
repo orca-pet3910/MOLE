@@ -1,5 +1,14 @@
 # MOLE v2.0
 welcome to MOLE, a programming language project!
+## dependencies
+- `__random__`
+- `__shell__`
+- `__statements__`
+- `random`
+- `shlex`
+- `time`
+- `sys`
+
 ## how to install
 you need a version of Python 3 compatible with the following packages:
 - shlex with shlex.split()
@@ -8,7 +17,7 @@ you need a version of Python 3 compatible with the following packages:
 a recommended version of Python is Python 3.12.2
 ## how to use
 the syntax for the command is
-`python mole.py filename.mole`
+`python mole.py filename.mole [-p/-s] [--nologo/--pause-on-exit]`
 
 a .mole file extension is **unnecessary** too
 
