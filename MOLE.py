@@ -18,6 +18,10 @@ class MOLEPackageError(BaseException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
+class MOLEInterpreterError(BaseException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
 class nul:
     def __str__(self):
         return "nul"
@@ -168,15 +172,12 @@ class MOLE:
                         if db0raise:
                             raise ZeroDivisionError(f"an attempt was made to divide {self.variables[ln[1]]} by zero - don't do that at home kids ;)")
                     elif ln[0] == "include":
-                        execute_failed = False
                         if ln[1] == "__my_dad__":
                             raise NameError("He went for milk. :P") from None
                         try:
                             with open(ln[1], "r", encoding="utf-8") as included:
                                 self.interpret(included.read().splitlines())
                         except FileNotFoundError:
-                            execute_failed = True
-                        if execute_failed:
                             raise RuntimeError(f"execution failed; no such file {ln[1]}")
                     elif ln[0] == "eat":
                         fail = False
@@ -193,7 +194,7 @@ class MOLE:
                             else:
                                 sleep(float(ln[1]))
                         except ValueError:
-                            raise Exception("whoops")
+                            raise MOLEInterpreterError("The value is NaN")
                     elif ln[0] == "endln":
                         print("")
                     elif ln[0] == "help":
@@ -254,6 +255,8 @@ class MOLE:
                             shell = Shell() #self.variables)
                         except NameError:
                             raise MOLEPackageMissing("Cannot initialize Shell, did you forget to `use __shell__`?")
+                        except:
+                            raise MOLEPackageCorrupted from RuntimeError("Failure to run the package")
                     elif ln[0] == "askbool":
                         if ln[1].strip() == "":
                             raise SyntaxError("you need to pass a variable in the first argument, otherwise the expression would be pointless")
@@ -282,21 +285,33 @@ class MOLE:
                             raise MOLEPackageError("An error occured inside the MOLE interpreter or one of the used packages")
                     elif ln[0] == "eval":
                         if len(ln) == 4 and ln[1] in self.variables and ln[2] == "->":
-                            print(self.variables[ln[1]])
-                            self.variables[ln[3]] = if_eval(self.variables[ln[1]], self._["yea"], self._["nah"], self._["nul"])
+                            try:
+                                self.variables[ln[3]] = if_eval(self.variables[ln[1]], self._["yea"], self._["nah"], self._["nul"])
+                            except:
+                                raise MOLEPackageError from MOLEInterpreterError
                     elif ln[0] == "exit":
                         return
+                    elif ln[0] == "asknumber":
+                        try:
+                            input_value = float(input((ln[2])))
+                            self.variables[ln[1]] = input_value
+                        except IndexError:
+                            raise MOLEInterpreterError("Could not get the value") from SyntaxError(NotImplemented)
+                        except ValueError:
+                            raise MOLEInterpreterError("Invalid value") from ValueError("Invalid value")
+                    elif ln[0] == "askstr":
+                        self.variables[ln[1]] = input(ln[2])
                     else:
                         raise SyntaxError(f"{ln[0]} is not a valid keyword")
-                except IndexError as ie:
+                except IndexError:
                     pass
         except Exception as e:
             raise e
 
 mole = MOLE()
 
-version = "v2.2.2"
-version_name = "Feature Update 2 Subrelease 2 Patch 2"
+version = "v2.3"
+version_name = "Feature Update 2 Subrelease 3"
 if __name__ == "__main__" and not "--nologo" in argv:
     print(f"MOLE version {version} ({version_name}) - made by orca.pet")
     if version[-1] == "b":
@@ -305,8 +320,8 @@ if __name__ == "__main__" and not "--nologo" in argv:
 if __name__ == "__main__":
     maincode = open(argv[1], "r+", encoding="utf-8").read().splitlines()
     mole.interpret(maincode)
+    if "--pause-on-exit" in argv or "-p" in argv:
+        input("Press enter to exit or drop to shell (-s).")
     if "-s" in argv:
         mole.interpret(["use __shell__", "__shell__"])
-    if "--pause-on-exit" in argv or "-p" in argv:
-        input("Press enter to exit.")
 # self._["yea"], self._["nah"], self._["nul"]
