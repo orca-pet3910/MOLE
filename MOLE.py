@@ -1,14 +1,20 @@
 from time import sleep
 import shlex
-
-version = "v2.0"
-print(f"MOLE version {version} - made by orca.pet")
-
-maincode = open(__import__("sys").argv[1], "r+", encoding="utf-8").read().splitlines()
-for line in maincode:
-    line.split("  ")
+from sys import argv
 
 class MOLEBetaException(BaseException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+class MOLEPackageCorrupted(BaseException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+class MOLEPackageMissing(BaseException):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)
+
+class MOLEPackageError(BaseException):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
 
@@ -17,28 +23,38 @@ class nul:
         return "nul"
     def __repr__(self):
         return "nul"
-nul = nul()
 
 class yea:
     def __str__(self):
         return "yea"
     def __repr__(self):
         return "yea"
-yea = yea()
 
 class nah:
     def __str__(self):
         return "nah"
     def __repr__(self):
         return "nah"
-nah = nah()
+    
+class _BOOL():
+    def __init__(self):
+        self.yea = yea()
+        self.nah = nah()
+        self.nul = nul()
+_BOOL = _BOOL()
 
 global MOLE
+
+def get_class():
+    while "mole" not in globals():
+        sleep(0.01)
+    return mole
 
 class MOLE:
     def __init__(self) -> None:
         self.variables = {}
         self.random_included = False
+        self._ = {"yea": _BOOL.yea, "nah": _BOOL.nah, "nul": _BOOL.nul}
 
     def warn(self, arg: str):
         print('[Module WARN]', arg.replace("\n", "\n[Module WARN] ")[2:-3])
@@ -47,14 +63,15 @@ class MOLE:
         print('[Interpreter WARN]', str(args).replace("\n", "\n[Interpreter WARN] ")[2:-3])
     
     def ierror(self, exceptionclass: any, args: str):
-        print(f'[Interpreter ERROR from {exceptionclass.__name__}] {args}')
+        print(f'[Interpreter ERROR from {exceptionclass.__name__}]\n{args.strip("\n")}')
         quit(1)
 
     def interpret(self, line: list):
-            try:
-                for ln in line:
-                    ln = shlex.split(ln) # used "  " as argument here
-                    #print("[Interpreter line] " + str(ln))
+        try:
+            for ln in line:
+                ln = shlex.split(ln) # used "  " as argument here
+                #print("[Interpreter line] " + str(ln))
+                try:
                     if ln[0] == "let":
                         if ln[2] == "be":
                             raise_ = False
@@ -65,11 +82,11 @@ class MOLE:
                                     self.variables[ln[1]] = float(ln[3])
                                 except ValueError:
                                     if ln[3] == "nul":
-                                        self.variables[ln[1]] = nul
+                                        self.variables[ln[1]] = self._["nul"]
                                     elif ln[3] == "yea":
-                                        self.variables[ln[1]] = yea
+                                        self.variables[ln[1]] = self._["yea"]
                                     elif ln[3] == "nah":
-                                        self.variables[ln[1]] = nah
+                                        self.variables[ln[1]] = self._["nah"]
                                     else:
                                         self.variables[ln[1]] = ln[3].replace(r"\n", "\n")
                                     # else:
@@ -81,44 +98,44 @@ class MOLE:
 
                     elif ln[0] == "print":
                         if ln[1] in self.variables:
-                            if self.variables[ln[1]] == nul:
-                                print("[Module] nul", end="")
-                            elif self.variables[ln[1]] == yea:
-                                print("[Module] yea", end="")
-                            elif self.variables[ln[1]] == nah:
-                                print("[Module] nah", end="")
+                            if self.variables[ln[1]] == self._["nul"]:
+                                print("nul", end="")
+                            elif self.variables[ln[1]] == self._["yea"]:
+                                print("yea", end="")
+                            elif self.variables[ln[1]] == self._["nah"]:
+                                print("nah", end="")
                             else:
                                 try:
-                                    print("[Module]", self.variables[ln[1]].replace(r"\n", "\n").replace(r"\r", "\r").replace(r"\"", "\"").replace("\n", "\n[Module] "), end="")
+                                    print(self.variables[ln[1]].replace(r"\n", "\n").replace(r"\r", "\r").replace(r"\"", "\""), end="")
                                 except:
-                                    print("[Module]", self.variables[ln[1]], end="")
+                                    print(self.variables[ln[1]], end="")
                         else:
                             if (ln[1][0] == '"' and ln[1][-1] == '"') or (ln[1][0] == "'" and ln[1][-1] == "'"):
                                 if ln[1][0] == '"' and ln[1][-1] == '"':
-                                    if not '"' in ln[1][1:-1]:
+                                    # if not '"' in ln[1][1:-1]:
                                         print(ln[1][1:-1], end="")
-                                    else:
-                                        raise SyntaxError("\" in a double-quoted string")
+                                    # else:
+                                        # raise SyntaxError("\" in a double-quoted string")
                                 elif ln[1][0] == "'" and ln[1][-1] == "'":
-                                    if not "'" in ln[1][1:-1]:
+                                    # if not "'" in ln[1][1:-1]:
                                         print(ln[1][1:-1], end="")
-                                    else:
-                                        raise SyntaxError("' in a single-quoted string")
+                                    # else:
+                                    #     raise SyntaxError("' in a single-quoted string")
                                 # else:
                                 #     try:
                                 #         print(float(ln[1]))
                                 #     except:
                                 #         raise Exception("an error occured, please contact the developer")
                             elif ln[1] == "nul":
-                                print("[Module] nul", end="")
+                                print("nul", end="")
                             elif ln[1] == "yea":
-                                print("[Module] yea", end="")
+                                print("yea", end="")
                             elif ln[1] == "nah":
-                                print("[Module] nah", end="")
+                                print("nah", end="")
                             else:
                                 #ln[1] = "'" + ln[1] + "'"
                                 try:
-                                    print("[Module]", ln[1], end="")
+                                    print(ln[1], end="")
                                 except:
                                     raise NameError(f"{ln[1]} is not a valid value") from None
                     elif ln[0].startswith("-!-"):
@@ -181,7 +198,7 @@ class MOLE:
                         print("")
                     elif ln[0] == "help":
                         print("""
-    help:
+    help for (not) Mighty Old Language Extended:
     "afk [seconds]": wait for [seconds] seconds
     "endln": prints a line break
     "eat [variable]": deletes [variable] from the universe
@@ -194,16 +211,32 @@ class MOLE:
     other words: adds the variable to the variables dictionary)
     "use [object]": includes an object, for example "random" will unlock "randomint [x] [y]"
     "randomint [x] [y]": generates a random integer within the range of [x] and [y]. (requires 'random')
+    "eval [in] -> [out]": passes through booleans, turns other values into nul (requires 'statements')
+    "if [a] [equals/nequals/lessthan/morethan] [b] -> [c]": an if statement (requires 'statements')
                         """, end="")
                     elif ln[0] == "use":
                         if ln[1] == "random":
-                            import random
-                            self.random_included = True
-                    elif ln[0] == "randomint":
-                        if self.random_included:
-                            print(random.randint(int(ln[1]), int(ln[2])), end="")
+                            try:
+                                global randint
+                                from __random__ import randint
+                            except:
+                                self.ierror(MOLEPackageMissing)
+                        elif ln[1] == "statements":
+                            try:
+                                global if_statement
+                                from __statements__ import if_statement, if_eval
+                            except:
+                                self.ierror(MOLEPackageMissing)
                         else:
-                            raise NameError("'randomint' is not a valid keyword. did you forget to use 'random'?")
+                            raise MOLEPackageMissing
+                    elif ln[0] == "randomint":
+                        if 'randint' in globals():
+                            self.variables[ln[3]] = (randint(int(ln[1]), int(ln[2])))
+                        else:
+                            # while 'randint' not in globals():
+                            #     sleep(0.01)
+                            self.ierror(MOLEPackageCorrupted)
+                        #("'randomint' is not a valid keyword. did you forget to use 'random'?")
                     elif ln[0] == "warn":
                         try:
                             self.warn(ln[1].strip())
@@ -216,20 +249,39 @@ class MOLE:
                         if ln[1].strip() == "":
                             raise SyntaxError("you need to pass a variable in the first argument, otherwise the expression would be pointless")
                         else:
-                            input_value = input("\n" + ln[2] + " [y/n] ")
+                            input_value = input((ln[2]) + " [y/n] ")
                             if input_value == "y" or input_value == "yes":
-                                self.variables[ln[1]] = yea
+                                self.variables[ln[1]] = self._["yea"]
                             elif input_value == "n" or input_value == "no":
-                                self.variables[ln[1]] = nah
+                                self.variables[ln[1]] = self._["nah"]
                             else:
-                                self.variables[ln[1]] = nul
+                                self.variables[ln[1]] = self._["nul"]
+                    elif ln[0] == "if":
+                        try:
+                            if len(ln) == 6 and ln[4] == "->":
+                                if ln[1] in self.variables and ln[3] in self.variables:
+                                    try:
+                                        self.variables[ln[5]] = if_statement(self.variables[ln[1]], self.variables[ln[3]], ln[2], self._["yea"], self._["nah"], self._["nul"])
+                                    except NameError:
+                                        raise MOLEPackageMissing("Cannot execute if operation, did you forget to `use statements`?")
+                                else:
+                                    raise SyntaxError("I don't know what is wrong, DM the developer of this or something")
+                            else:
+                                raise SyntaxError("Malformed if syntax")
+                                # self.variables[ln[4]] = if_statement(self.variables[ln[1]], ln[2]) if ln[3] == "saveto" else self._["nul"]
+                        except Exception as e:
+                            raise MOLEPackageError("An error occured inside the MOLE interpreter or one of the used packages")
+                    elif ln[0] == "eval":
+                        if len(ln) == 4 and ln[1] in self.variables and ln[2] == "->":
+                            print(self.variables[ln[1]])
+                            self.variables[ln[3]] = if_eval(self.variables[ln[1]], self._["yea"], self._["nah"], self._["nul"])
                     else:
                         raise SyntaxError(f"{ln[0]} is not a valid keyword")
-            except Exception as e:
-                try:
-                    self.ierror(e.__class__, str(e.args[0]))
-                except:
-                    self.ierror(e.__class__, "\b")
+                except IndexError as ie:
+                    pass
+        except Exception as e:
+            raise e
+            
 
 class Shell(MOLE):
     def __init__(self):
@@ -238,10 +290,16 @@ class Shell(MOLE):
             command = input("\n>>> ")
             shell.interpret(line=[command])
 
-
 mole = MOLE()
-if version[-1] == "b":
-    mole.iwarn(f"beta version ahead; use at your own risk")
 
-mole.interpret(maincode)
+version = "v2.1.1"
+version_name = "Feature Update 2 Subrelease 1 Patch 1"
+if __name__ == "__main__" and not (len(argv) == 3 and argv[2] == "--nologo"):
+    print(f"MOLE version {version} ({version_name}) - made by orca.pet")
+    if version[-1] == "b":
+        mole.iwarn(f"beta version ahead; use at your own risk")
 
+if __name__ == "__main__":
+    maincode = open(argv[1], "r+", encoding="utf-8").read().splitlines()
+    mole.interpret(maincode)
+# self._["yea"], self._["nah"], self._["nul"]
