@@ -10,6 +10,11 @@ a recommended version of Python is Python 3.12.2
 the syntax for the command is
 `python mole.py filename.mole`
 
-a .mole file extension is unnecessary too
+a .mole file extension is **unnecessary** too
 
 you should read the help sheet too by making a file with nothing but `help` in it and running it with mole.py
+
+## version history (DD.MM.YYYY):
+v2.0: 15.11.2025 18:37/6:37 PM GMT+1
+v2.1.1: 16.11.2025 ??:?? ?M GMT+1
+v2.2.1 17.11.2025 15:10/3:10 PM GMT+1
