@@ -220,13 +220,19 @@ class MOLE:
                                 global randint
                                 from __random__ import randint
                             except:
-                                self.ierror(MOLEPackageMissing)
+                                self.ierror(MOLEPackageMissing, "")
                         elif ln[1] == "statements":
                             try:
                                 global if_statement
                                 from __statements__ import if_statement, if_eval
                             except:
-                                self.ierror(MOLEPackageMissing)
+                                self.ierror(MOLEPackageMissing, "")
+                        elif ln[1] == "__shell__":
+                            try:
+                                global Shell
+                                from __shell__ import Shell
+                            except:
+                                self.ierror(MOLEPackageMissing, "")
                         else:
                             raise MOLEPackageMissing
                     elif ln[0] == "randomint":
@@ -235,7 +241,7 @@ class MOLE:
                         else:
                             # while 'randint' not in globals():
                             #     sleep(0.01)
-                            self.ierror(MOLEPackageCorrupted)
+                            self.ierror(MOLEPackageCorrupted, "")
                         #("'randomint' is not a valid keyword. did you forget to use 'random'?")
                     elif ln[0] == "warn":
                         try:
@@ -244,7 +250,10 @@ class MOLE:
                             self.iwarn("received a warning request with no message, ignoring")
                     elif ln[0] == "__shell__":
                         self.iwarn("Shell() is permanent until removed from the file and MOLE is restarted.")
-                        shell = Shell()
+                        try:
+                            shell = Shell() #self.variables)
+                        except NameError:
+                            raise MOLEPackageMissing("Cannot initialize Shell, did you forget to `use __shell__`?")
                     elif ln[0] == "askbool":
                         if ln[1].strip() == "":
                             raise SyntaxError("you need to pass a variable in the first argument, otherwise the expression would be pointless")
@@ -275,26 +284,20 @@ class MOLE:
                         if len(ln) == 4 and ln[1] in self.variables and ln[2] == "->":
                             print(self.variables[ln[1]])
                             self.variables[ln[3]] = if_eval(self.variables[ln[1]], self._["yea"], self._["nah"], self._["nul"])
+                    elif ln[0] == "exit":
+                        return
                     else:
                         raise SyntaxError(f"{ln[0]} is not a valid keyword")
                 except IndexError as ie:
                     pass
         except Exception as e:
             raise e
-            
-
-class Shell(MOLE):
-    def __init__(self):
-        shell = MOLE()
-        while True:
-            command = input("\n>>> ")
-            shell.interpret(line=[command])
 
 mole = MOLE()
 
-version = "v2.1.1"
-version_name = "Feature Update 2 Subrelease 1 Patch 1"
-if __name__ == "__main__" and not (len(argv) == 3 and argv[2] == "--nologo"):
+version = "v2.2.2"
+version_name = "Feature Update 2 Subrelease 2 Patch 2"
+if __name__ == "__main__" and not "--nologo" in argv:
     print(f"MOLE version {version} ({version_name}) - made by orca.pet")
     if version[-1] == "b":
         mole.iwarn(f"beta version ahead; use at your own risk")
@@ -302,4 +305,8 @@ if __name__ == "__main__" and not (len(argv) == 3 and argv[2] == "--nologo"):
 if __name__ == "__main__":
     maincode = open(argv[1], "r+", encoding="utf-8").read().splitlines()
     mole.interpret(maincode)
+    if "-s" in argv:
+        mole.interpret(["use __shell__", "__shell__"])
+    if "--pause-on-exit" in argv or "-p" in argv:
+        input("Press enter to exit.")
 # self._["yea"], self._["nah"], self._["nul"]
