@@ -215,6 +215,7 @@ class MOLE:
     "eval [in] -> [out]": passes through booleans, turns other values into nul (requires 'statements')
     "if [a] [equals/nequals/lessthan/morethan] [b] -> [c]": an if statement (requires 'statements')
     "[asknumber/askbool/askstr] [x] [STRING]": ask for values
+    "execifeval [x] -> [filename]": if a value is `yea`, execute a file or exit if [filename] is "exit"
                         """, end="")
                     elif ln[0] == "use":
                         if ln[1] == "random":
