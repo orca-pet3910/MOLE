@@ -278,7 +278,7 @@ class MOLE:
                                     except NameError:
                                         raise MOLEPackageMissing("Cannot execute if operation, did you forget to `use statements`?")
                                 else:
-                                    raise SyntaxError("I don't know what is wrong, DM the developer of this or something")
+                                    raise SyntaxError("Not a valid variable") #("I don't know what is wrong, DM the developer of this or something")
                             else:
                                 raise SyntaxError("Malformed if syntax")
                                 # self.variables[ln[4]] = if_statement(self.variables[ln[1]], ln[2]) if ln[3] == "saveto" else self._["nul"]
@@ -339,3 +339,4 @@ if __name__ == "__main__":
         mole.interpret(["use __shell__", "__shell__"])
 
 # self._["yea"], self._["nah"], self._["nul"]
+
