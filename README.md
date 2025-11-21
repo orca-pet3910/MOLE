@@ -1,5 +1,6 @@
 # NA-MOLE v2
 say hi to Now Actually Mighty Old Language Extended
+
 welcome to NA-MOLE, a programming language project!
 ## dependencies
 - `__random__`
