@@ -13,6 +13,7 @@ welcome to NA-MOLE, a programming language project!
 
 ## how to install
 you need a version of Python 3 compatible with the packages shown above
+
 a recommended version of Python is Python 3.12.2
 ## how to use
 the syntax for the command is
